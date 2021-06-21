@@ -6,7 +6,7 @@ use std::time;
 use sysinfo::SystemExt;
 use sysinfo::ProcessorExt;
 
-fn get_cpu_avg(req_sys: sysinfo::System) -> f32
+fn get_cpu_use(req_sys: &sysinfo::System) -> f32
 {
 
     let mut cpus: Vec<f32> = Vec::new();
@@ -19,6 +19,11 @@ fn get_cpu_avg(req_sys: sysinfo::System) -> f32
 
 }
 
+fn get_ram_use(req_sys: &sysinfo::System) -> f32
+{
+    (req_sys.get_used_memory() as f32) / (req_sys.get_total_memory() as f32) * 100.
+}
+
 fn main()
 {
     println!("Starting dwm-status... ");
@@ -26,7 +31,8 @@ fn main()
     let mut current_sys = sysinfo::System::new_all();
     current_sys.refresh_all();
 
-    let cpu_avg = get_cpu_avg(current_sys);
+    let cpu_avg = get_cpu_use(&current_sys);
+    let ram_prcnt = get_ram_use(&current_sys);
 
-    println! ("CPU: {:.1}", cpu_avg);
+    println! ("CPU: {:.1}%\tRAM: {:.1}", cpu_avg, ram_prcnt);
 }
