@@ -8,6 +8,25 @@ use sysinfo::ProcessorExt;
 use sysinfo::NetworkExt;
 use sysinfo::ComponentExt;
 
+// Add whitespace prepending a value
+fn add_whitespace (str_to_format: String, chars_tot: u32) -> String
+{
+    // Get the length of the passed string and calculate how many spaces to add
+    let char_num = str_to_format.as_bytes().len() as u32;
+    let space_num = chars_tot - char_num;
+
+    // Create a new string to add everything to
+    let mut ret_string = String::new();
+
+    // Add all the needed spaces to that string
+    for _i in 0..space_num { ret_string.push(' '); }
+
+    // Add the original string to it
+    ret_string.push_str(&str_to_format);
+
+    ret_string
+}
+
 // Get the average core usage
 fn get_cpu_use(req_sys: &sysinfo::System) -> f32
 {
@@ -86,14 +105,20 @@ fn main()
         // Call each function to get all the values we need
         let cpu_avg = get_cpu_use(&current_sys);
         let ram_prcnt = get_ram_use(&current_sys);
-        let _swp_prcnt = get_swp_use(&current_sys); // We're not using swap for now because it's almost always 0, but we'll add it as a cli arg in the future
+        let swp_prcnt = get_swp_use(&current_sys);
         let ntwk_dwn = get_ntwk_dwn(&current_sys);
         let ntwk_up = get_ntwk_up(&current_sys);
         let temp = get_temp(&current_sys);
 
+        let prnt_cpu = add_whitespace(format! ("{:.1}",cpu_avg), 5);
+        let prnt_ram = add_whitespace(format! ("{:.1}",ram_prcnt), 5);
+        let _prnt_swp = add_whitespace(format! ("{:.1}",swp_prcnt), 5); // We're not using swap for now because it's almost always 0, but we'll add it as a cli arg in the future
+        let prnt_dwn = add_whitespace(format! ("{:.1}",ntwk_dwn), 5);
+        let prnt_up = add_whitespace(format! ("{:.1}",ntwk_up), 5);
+        let prnt_tmp = add_whitespace(format! ("{:.1}",temp), 3);
+
         // Format the message to go on the bar
-        // TODO: format the entries properly so the size doesn't change
-        let msg = format! ("CPU: {:.1}%\t\tTemp: {}°C\t\tRAM: {:.1}%\t\tDownload: {}Kbps\t\tUpload: {}Kbps", cpu_avg, temp, ram_prcnt, ntwk_dwn, ntwk_up);
+        let msg = format! ("CPU: {}%|Temp: {}°C|RAM: {}%|Download: {}Kbps|Upload: {}Kbps", prnt_cpu, prnt_tmp, prnt_ram, prnt_dwn, prnt_up);
 
         // Execute `xsetroot` with the message
         std::process::Command::new("xsetroot").arg("-name").arg(msg).spawn().expect("`xsetroot` has failed!");
