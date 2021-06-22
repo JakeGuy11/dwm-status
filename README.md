@@ -4,4 +4,4 @@ dwm-status is a hardware monitor written in rust targeted at the DWM window mana
 
 I will add more details in the future when I implement command line arguments but for now, this is it.
 
-To use it, put `/path/to/dwm-status &` in your `.xinitrc` or equivalent file.
+To use it, download the latest release and run `install.sh` as root, then put `dwm-status &` in your `.xinitrc` or equivalent file.
